@@ -1,10 +1,14 @@
-// === Configuration des URLs de l'API ===
+// ============================
+// Configuration de l'API
+// ============================
 const API_BASE_URL = "http://localhost:8000/api/v1";
 const MOVIES_ENDPOINT = `${API_BASE_URL}/titles/`;
 const GENRES_ENDPOINT = `${API_BASE_URL}/genres/`;
 
-// === Sélection des éléments du DOM ===
-const DOM_ELEMENTS = {
+// ============================
+// Sélection des éléments DOM
+// ============================
+const DOM = {
   randomCategoryTitle: document.getElementById("random-category-title"),
   randomCategoryMovies: document.getElementById("random-category-movies"),
   categorySelect: document.getElementById("category"),
@@ -13,9 +17,13 @@ const DOM_ELEMENTS = {
   voirPlusBtn: document.getElementById("voir-plus"),
 };
 
-let nextPageUrl = null; // Variable pour gérer la pagination
+let nextPageUrl = null;
+let previousPageUrl = null; // Pour gérer la pagination arrière
+let isReversing = false; // Détecte si l'on fait "Voir moins"
 
-// === Fonction pour créer une carte de film ===
+// ============================
+// Création de la carte de film
+// ============================
 function createMovieCard(movie) {
   return `
     <div class="col-12 col-md-6 col-lg-4">
@@ -23,16 +31,16 @@ function createMovieCard(movie) {
         <img src="${movie.image_url}" alt="${movie.title}" />
         <div class="overlay">
           <h5>${movie.title}</h5>
-          <button class="btn-overlay" onclick="showMovieDetails(${movie.id})">
-            Détails
-          </button>
+          <button class="btn-overlay" onclick="showMovieDetails(${movie.id})">Détails</button>
         </div>
       </div>
     </div>
   `;
 }
 
-// === Fonction pour récupérer des films par genre ou via une URL de pagination ===
+// ============================
+// Récupération des films
+// ============================
 async function fetchMovies({
   genre = null,
   container,
@@ -45,8 +53,12 @@ async function fetchMovies({
     const data = await response.json();
 
     if (!url && genre) {
-      container.innerHTML = ""; // Nettoyage de la section uniquement lors du premier chargement
-      titleElement.textContent = genre; // Mise à jour du titre
+      container.innerHTML = "";
+      titleElement.textContent = genre;
+    }
+
+    if (isReversing) {
+      container.innerHTML = "";
     }
 
     data.results.forEach((movie) => {
@@ -54,104 +66,86 @@ async function fetchMovies({
     });
 
     nextPageUrl = data.next;
-    DOM_ELEMENTS.voirPlusBtn.style.display = nextPageUrl ? "block" : "none";
+    previousPageUrl = data.previous;
+
+    if (!nextPageUrl && !isReversing) {
+      DOM.voirPlusBtn.textContent = "Voir moins";
+    } else if (isReversing && !previousPageUrl) {
+      DOM.voirPlusBtn.textContent = "Voir plus";
+      isReversing = false;
+    }
   } catch (error) {
     console.error("Erreur lors de la récupération des films:", error);
   }
 }
 
-// === Fonction pour récupérer tous les genres ===
-async function fetchAllGenres() {
-  try {
-    const response = await fetch(GENRES_ENDPOINT);
-    const data = await response.json();
-    return data.results;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des genres:", error);
-    return [];
-  }
-}
-
-// === Initialisation des catégories ===
+// ============================
+// Initialisation des catégories
+// ============================
 async function initializeCategories() {
-  const genres = await fetchAllGenres();
+  const response = await fetch(GENRES_ENDPOINT);
+  const data = await response.json();
+  const genres = data.results;
 
   if (genres.length > 0) {
-    // Choisir une catégorie aléatoire
     const randomGenre = genres[Math.floor(Math.random() * genres.length)];
     fetchMovies({
       genre: randomGenre.name,
-      container: DOM_ELEMENTS.randomCategoryMovies,
-      titleElement: DOM_ELEMENTS.randomCategoryTitle,
+      container: DOM.randomCategoryMovies,
+      titleElement: DOM.randomCategoryTitle,
     });
 
-    // Remplir le sélecteur de catégories
     genres.forEach((genre) => {
-      const option = document.createElement("option");
-      option.value = genre.name;
-      option.textContent = genre.name;
-      DOM_ELEMENTS.categorySelect.appendChild(option);
+      const option = new Option(genre.name, genre.name);
+      DOM.categorySelect.appendChild(option);
     });
   }
 }
 
-// === Gestion des événements ===
+// ============================
+// Gestion des événements
+// ============================
 function setupEventListeners() {
-  // Gestion de la sélection d'une catégorie
-  DOM_ELEMENTS.categorySelect.addEventListener("change", (event) => {
-    const selectedGenre = event.target.value;
+  DOM.categorySelect.addEventListener("change", (event) => {
     fetchMovies({
-      genre: selectedGenre,
-      container: DOM_ELEMENTS.selectedCategoryMovies,
-      titleElement: DOM_ELEMENTS.selectedCategoryTitle,
+      genre: event.target.value,
+      container: DOM.selectedCategoryMovies,
+      titleElement: DOM.selectedCategoryTitle,
     });
   });
 
-  // Gestion du bouton "Voir plus"
-  DOM_ELEMENTS.voirPlusBtn.addEventListener("click", () => {
-    if (nextPageUrl) {
-      const isRandomCategory =
-        DOM_ELEMENTS.randomCategoryTitle.textContent !== "";
-      const currentGenre = isRandomCategory
-        ? DOM_ELEMENTS.randomCategoryTitle.textContent
-        : DOM_ELEMENTS.categorySelect.value;
-      const currentContainer = isRandomCategory
-        ? DOM_ELEMENTS.randomCategoryMovies
-        : DOM_ELEMENTS.selectedCategoryMovies;
-      const currentTitle = isRandomCategory
-        ? DOM_ELEMENTS.randomCategoryTitle
-        : DOM_ELEMENTS.selectedCategoryTitle;
-
+  DOM.voirPlusBtn.addEventListener("click", () => {
+    if (DOM.voirPlusBtn.textContent === "Voir plus" && nextPageUrl) {
       fetchMovies({
-        genre: currentGenre,
-        container: currentContainer,
-        titleElement: currentTitle,
+        container: DOM.randomCategoryMovies,
+        titleElement: DOM.randomCategoryTitle,
         url: nextPageUrl,
+      });
+    } else if (
+      DOM.voirPlusBtn.textContent === "Voir moins" &&
+      previousPageUrl
+    ) {
+      isReversing = true;
+      fetchMovies({
+        container: DOM.randomCategoryMovies,
+        titleElement: DOM.randomCategoryTitle,
+        url: previousPageUrl,
       });
     }
   });
 }
 
-// === Initialisation au chargement de la page ===
-(function initializeApp() {
-  initializeCategories();
-  setupEventListeners();
-})();
-
+// ============================
+// Affichage des détails du film
+// ============================
 async function showMovieDetails(movieId) {
-  console.log("showMovieDetails", movieId);
-
   try {
-    const response = await fetch(
-      `http://localhost:8000/api/v1/titles/${movieId}`
-    );
+    const response = await fetch(`${MOVIES_ENDPOINT}${movieId}`);
     const movie = await response.json();
 
-    // Mise à jour des informations du modal
     document.getElementById("filmModalLabel").textContent = movie.title;
     document.getElementById("film-details").innerHTML = `
-      <strong>${movie.year} - ${movie.genre}</strong><br>
-      <strong>${movie.rating} - ${movie.duration} minutes</strong><br>
+      <strong>${movie.year} - ${movie.genres.join(", ")}</strong><br>
       <strong>IMDB score: ${movie.imdb_score}/10</strong>
     `;
     document.getElementById("film-directors").textContent =
@@ -160,10 +154,16 @@ async function showMovieDetails(movieId) {
     document.getElementById("film-cast").textContent = movie.actors.join(", ");
     document.getElementById("film-poster").src = movie.image_url;
 
-    // Affichage du modal
-    const filmModal = new bootstrap.Modal(document.getElementById("filmModal"));
-    filmModal.show();
+    new bootstrap.Modal(document.getElementById("filmModal")).show();
   } catch (error) {
     console.error("Erreur lors de la récupération des détails du film:", error);
   }
 }
+
+// ============================
+// Initialisation de l'application
+// ============================
+(function initializeApp() {
+  initializeCategories();
+  setupEventListeners();
+})();
