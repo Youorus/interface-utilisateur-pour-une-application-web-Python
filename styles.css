@@ -1,22 +1,4 @@
 /* Style pour la barre de navigation */
-.navbar {
-  border: 1px solid black;
-  background-color: #61787f !important;
-  padding: 15px;
-  margin-top: 1%;
-}
-
-.logo {
-  width: 20%;
-  height: auto;
-  margin-left: 5%;
-}
-
-/* Centrer le titre et cacher sur mobile */
-.navbar-title {
-  flex-grow: 1; /* Permet au titre de s'étirer */
-  text-align: center;
-}
 
 /* Masquer le texte sur mobile (< 768px) */
 @media (max-width: 767px) {
@@ -29,12 +11,6 @@
 }
 
 /* Meilleur Film */
-.best-movie {
-  border: 10px solid black;
-  padding: 15px;
-  display: flex;
-  align-items: center;
-}
 
 /* Image du film */
 .best-movie img {
@@ -54,9 +30,6 @@
 }
 
 /* Alignement du bouton "Détails" en bas à droite */
-.best-movie .text-end {
-  margin-top: auto; /* Force le bouton à rester en bas */
-}
 
 /* Description du film */
 .movie-description {
@@ -124,27 +97,8 @@
 /* Afficher l’overlay au survol */
 
 /* Titre du film */
-.overlay h5 {
-  font-size: 2rem;
-  font-weight: bold;
-  margin: 0;
-}
-.titre-text {
-  font-weight: bolder;
-  font-size: 3rem;
-}
 
 /* Bouton Détails */
-.overlay .btn-overlay {
-  background-color: #2d2c2c;
-  color: white;
-  font-weight: 300;
-  font-size: 1.2rem;
-  padding: 8px 20px;
-  border-radius: 20px;
-  border: none;
-  align-self: flex-end;
-}
 
 .voir-plus {
   display: none;
@@ -160,17 +114,6 @@
 }
 
 /* Conteneur du select */
-.select-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Style du label "Autres:" */
-.title-label {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
 
 /* Style du select */
 .custom-select {
@@ -185,10 +128,6 @@
   appearance: none; /* Supprime le style par défaut */
   -webkit-appearance: none;
   -moz-appearance: none;
-
-  /* Ajout de la flèche en background */
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='black'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 14px;
   padding-right: 35px; /* Assurer un espace pour la flèche */
