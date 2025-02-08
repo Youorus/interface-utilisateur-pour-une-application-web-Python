@@ -222,3 +222,18 @@ a {
 .hidden {
   display: none; /* Cache le loader lorsqu'il n'est pas nécessaire */
 }
+/* ============================ */
+/* Masquer les boutons par défaut */
+/* ============================ */
+#voir-plus-random,
+#voir-plus-selected {
+  display: none; /* Masqué par défaut sur les grands écrans */
+}
+
+/* ✅ Afficher les boutons uniquement pour les écrans de 991px et moins */
+@media (max-width: 991px) {
+  #voir-plus-random,
+  #voir-plus-selected {
+    display: inline-block; /* Affiche les boutons en mode tablette et mobile */
+  }
+}

@@ -14,66 +14,59 @@ const DOM = {
   categorySelect: document.getElementById("category"),
   selectedCategoryTitle: document.getElementById("selected-category-title"),
   selectedCategoryMovies: document.getElementById("selected-category-movies"),
-  voirPlusBtn: document.getElementById("voir-plus"),
+  voirPlusButtons: {
+    random: document.getElementById("voir-plus-random"),
+    selected: document.getElementById("voir-plus-selected"),
+  },
+  bestMovieContainer: document.querySelector(".best-movie"), // ✅ Conteneur pour le meilleur film
 };
 
-let nextPageUrl = null;
-let previousPageUrl = null; // Pour gérer la pagination arrière
-let isReversing = false; // Détecte si l'on fait "Voir moins"
+// ============================
+// Variables Globales
+// ============================
+const pagination = {
+  random: { next: null, previous: null },
+  selected: { next: null, previous: null },
+};
+
+let isReversing = false; // Pour détecter l'état "Voir moins"
 
 // ============================
 // Gestion du Loader
 // ============================
-
-/**
- * Affiche le loader à l'écran.
- */
-function showLoader() {
-  document.getElementById("loader").classList.remove("hidden");
-}
-
-/**
- * Masque le loader de l'écran.
- */
-function hideLoader() {
-  document.getElementById("loader").classList.add("hidden");
-}
+const toggleLoader = (show) => {
+  document.getElementById("loader").classList.toggle("hidden", !show);
+};
 
 // ============================
 // Création de la carte de film
 // ============================
-/**
- * Crée une carte d'affichage pour un film.
- * @param {Object} movie - Les données du film.
- * @returns {string} - Le HTML de la carte du film.
- */
-function createMovieCard(movie) {
-  return `
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="movie-card">
-        <img src="${movie.image_url}" alt="${movie.title}" />
-        <div class="overlay">
-          <h5>${movie.title}</h5>
-          <button class="btn-overlay" onclick="showMovieDetails(${movie.id})">Détails</button>
-        </div>
+const createMovieCard = (movie) => `
+  <div class="col-12 col-md-6 col-lg-4">
+    <div class="movie-card">
+      <img src="${movie.image_url}" alt="${movie.title}" />
+      <div class="overlay">
+        <h5>${movie.title}</h5>
+        <button class="btn-overlay" onclick="showMovieDetails(${movie.id})">Détails</button>
       </div>
     </div>
-  `;
-}
+  </div>
+`;
 
 // ============================
-// Affichage du meilleur film
+// Affichage des Films
 // ============================
-let bestMovie = null;
+const displayMovies = (movies, container) => {
+  movies.forEach((movie) => {
+    container.insertAdjacentHTML("beforeend", createMovieCard(movie));
+  });
+};
 
-/**
- * Affiche les détails du meilleur film.
- * @param {Object} movie - Les données du film à afficher.
- */
-function displayBestMovie(movie) {
-  const bestMovieContainer = document.querySelector(".best-movie");
-
-  const bestMovieHTML = `
+// ============================
+// Affichage du Meilleur Film
+// ============================
+const displayBestMovie = (movie) => {
+  DOM.bestMovieContainer.innerHTML = `
     <div class="col-md-3">
       <img src="${movie.image_url}" alt="${
     movie.title
@@ -81,9 +74,9 @@ function displayBestMovie(movie) {
     </div>
     <div class="col-md-9 d-flex flex-column">
       <h4 class="fw-bold titre-text">${movie.title}</h4>
-      <p class="movie-description">
-        ${movie.description || "Description non disponible."}
-      </p>
+      <p class="movie-description">${
+        movie.description || "Description non disponible."
+      }</p>
       <div class="text-end">
         <button class="btn-detail" onclick="showMovieDetails(${
           movie.id
@@ -91,71 +84,32 @@ function displayBestMovie(movie) {
       </div>
     </div>
   `;
-
-  bestMovieContainer.innerHTML = bestMovieHTML;
-}
+};
 
 // ============================
-// Récupération du meilleur film
+// Gestion de la Pagination
 // ============================
-/**
- * Récupère et affiche le film avec le plus de votes.
- */
-async function fetchBestMovie() {
-  showLoader(); // Affiche le loader
-  try {
-    const response = await fetch(MOVIES_ENDPOINT);
-    const data = await response.json();
-    const totalPages = Math.ceil(data.count / data.results.length);
-    const maxPages = Math.min(totalPages, 100);
+const updatePagination = (data, type) => {
+  pagination[type].next = data.next;
+  pagination[type].previous = data.previous;
 
-    const urls = Array.from(
-      { length: maxPages },
-      (_, i) => `${MOVIES_ENDPOINT}?page=${i + 1}`
-    );
-    const fetchPromises = urls.map((url) =>
-      fetch(url).then((res) => res.json())
-    );
-    const allPagesData = await Promise.all(fetchPromises);
-
-    allPagesData.forEach((pageData) => {
-      pageData?.results.forEach((movie) => {
-        if (!bestMovie || movie.votes > bestMovie.votes) {
-          bestMovie = movie;
-        }
-      });
-    });
-
-    const bestMovieDetailsResponse = await fetch(
-      `${MOVIES_ENDPOINT}${bestMovie.id}`
-    );
-    const bestMovieDetails = await bestMovieDetailsResponse.json();
-
-    displayBestMovie(bestMovieDetails);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des films:", error);
-  } finally {
-    hideLoader(); // Masque le loader après le chargement
-  }
-}
+  DOM.voirPlusButtons[type].textContent = data.next
+    ? "Voir plus"
+    : "Voir moins";
+  if (isReversing && !data.previous) isReversing = false;
+};
 
 // ============================
-// Récupération des films
+// Récupération des Films
 // ============================
-/**
- * Récupère les films d'un genre spécifique ou d'une URL donnée.
- * @param {Object} params - Paramètres pour la récupération des films.
- * @param {string|null} params.genre - Genre du film.
- * @param {HTMLElement} params.container - Conteneur DOM pour afficher les films.
- * @param {HTMLElement} params.titleElement - Élément DOM pour afficher le titre du genre.
- * @param {string|null} params.url - URL spécifique pour la récupération des films.
- */
-async function fetchMovies({
+const fetchMovies = async ({
   genre = null,
   container,
   titleElement,
   url = null,
-}) {
+  type = "random",
+}) => {
+  toggleLoader(true);
   try {
     const fetchUrl = url || `${MOVIES_ENDPOINT}?genre=${genre}`;
     const response = await fetch(fetchUrl);
@@ -166,57 +120,84 @@ async function fetchMovies({
       titleElement.textContent = genre;
     }
 
-    if (isReversing) {
-      container.innerHTML = "";
-    }
+    if (isReversing) container.innerHTML = "";
 
-    data.results.forEach((movie) => {
-      container.insertAdjacentHTML("beforeend", createMovieCard(movie));
-    });
+    displayMovies(data.results, container);
+    updatePagination(data, type);
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des films (${type}):`, error);
+  } finally {
+    toggleLoader(false);
+  }
+};
 
-    nextPageUrl = data.next;
-    previousPageUrl = data.previous;
+// ============================
+// Récupération du Meilleur Film
+// ============================
+const fetchBestMovie = async () => {
+  toggleLoader(true);
+  try {
+    const response = await fetch(MOVIES_ENDPOINT);
+    const data = await response.json();
 
-    if (!nextPageUrl && !isReversing) {
-      DOM.voirPlusBtn.textContent = "Voir moins";
-    } else if (isReversing && !previousPageUrl) {
-      DOM.voirPlusBtn.textContent = "Voir plus";
-      isReversing = false;
+    const totalPages = Math.ceil(data.count / data.results.length);
+    const maxPages = Math.min(totalPages, 100); // Limite à 100 pages pour optimisation
+
+    const urls = Array.from(
+      { length: maxPages },
+      (_, i) => `${MOVIES_ENDPOINT}?page=${i + 1}`
+    );
+    const fetchPromises = urls.map((url) =>
+      fetch(url).then((res) => res.json())
+    );
+    const allPagesData = await Promise.all(fetchPromises);
+
+    // Trouver le film avec le plus de votes
+    const bestMovie = allPagesData
+      .flatMap((page) => page.results)
+      .reduce(
+        (max, movie) => (movie.votes > (max?.votes || 0) ? movie : max),
+        null
+      );
+
+    if (bestMovie) {
+      const bestMovieDetailsResponse = await fetch(
+        `${MOVIES_ENDPOINT}${bestMovie.id}`
+      );
+      const bestMovieDetails = await bestMovieDetailsResponse.json();
+      displayBestMovie(bestMovieDetails);
     }
   } catch (error) {
-    console.error("Erreur lors de la récupération des films:", error);
+    console.error("Erreur lors de la récupération du meilleur film:", error);
+  } finally {
+    toggleLoader(false);
   }
-}
+};
 
 // ============================
-// Initialisation des catégories
+// Initialisation des Catégories
 // ============================
-/**
- * Initialise les catégories de films disponibles.
- */
-async function initializeCategories() {
+const initializeCategories = async () => {
   try {
     let genres = [];
     let nextPageUrl = GENRES_ENDPOINT;
 
-    // Récupération de toutes les pages de genres
     while (nextPageUrl) {
       const response = await fetch(nextPageUrl);
       const data = await response.json();
       genres = [...genres, ...data.results];
-      nextPageUrl = data.next; // Passe à la page suivante s'il y en a une
+      nextPageUrl = data.next;
     }
 
-    // Affiche un genre aléatoire
     if (genres.length > 0) {
       const randomGenre = genres[Math.floor(Math.random() * genres.length)];
       fetchMovies({
         genre: randomGenre.name,
         container: DOM.randomCategoryMovies,
         titleElement: DOM.randomCategoryTitle,
+        type: "random",
       });
 
-      // Ajout des genres dans le select
       genres.forEach((genre) => {
         const option = new Option(genre.name, genre.name);
         DOM.categorySelect.appendChild(option);
@@ -225,52 +206,56 @@ async function initializeCategories() {
   } catch (error) {
     console.error("Erreur lors de la récupération des genres:", error);
   }
-}
+};
 
 // ============================
-// Gestion des événements
+// Gestion des Événements
 // ============================
-/**
- * Configure les écouteurs d'événements pour les interactions utilisateur.
- */
-function setupEventListeners() {
+const handleVoirPlusClick = (type) => {
+  const { next, previous } = pagination[type];
+
+  if (DOM.voirPlusButtons[type].textContent === "Voir plus" && next) {
+    fetchMovies({
+      container: DOM[`${type}CategoryMovies`],
+      titleElement: DOM[`${type}CategoryTitle`],
+      url: next,
+      type,
+    });
+  } else if (
+    DOM.voirPlusButtons[type].textContent === "Voir moins" &&
+    previous
+  ) {
+    isReversing = true;
+    fetchMovies({
+      container: DOM[`${type}CategoryMovies`],
+      titleElement: DOM[`${type}CategoryTitle`],
+      url: previous,
+      type,
+    });
+  }
+};
+
+const setupEventListeners = () => {
   DOM.categorySelect.addEventListener("change", (event) => {
     fetchMovies({
       genre: event.target.value,
       container: DOM.selectedCategoryMovies,
       titleElement: DOM.selectedCategoryTitle,
+      type: "selected",
     });
   });
 
-  DOM.voirPlusBtn.addEventListener("click", () => {
-    if (DOM.voirPlusBtn.textContent === "Voir plus" && nextPageUrl) {
-      fetchMovies({
-        container: DOM.randomCategoryMovies,
-        titleElement: DOM.randomCategoryTitle,
-        url: nextPageUrl,
-      });
-    } else if (
-      DOM.voirPlusBtn.textContent === "Voir moins" &&
-      previousPageUrl
-    ) {
-      isReversing = true;
-      fetchMovies({
-        container: DOM.randomCategoryMovies,
-        titleElement: DOM.randomCategoryTitle,
-        url: previousPageUrl,
-      });
-    }
+  Object.keys(DOM.voirPlusButtons).forEach((type) => {
+    DOM.voirPlusButtons[type].addEventListener("click", () =>
+      handleVoirPlusClick(type)
+    );
   });
-}
+};
 
 // ============================
-// Affichage des détails du film
+// Affichage des Détails du Film
 // ============================
-/**
- * Affiche les détails d'un film dans une modale.
- * @param {number} movieId - ID du film à afficher.
- */
-async function showMovieDetails(movieId) {
+const showMovieDetails = async (movieId) => {
   try {
     const response = await fetch(`${MOVIES_ENDPOINT}${movieId}`);
     const movie = await response.json();
@@ -291,13 +276,13 @@ async function showMovieDetails(movieId) {
   } catch (error) {
     console.error("Erreur lors de la récupération des détails du film:", error);
   }
-}
+};
 
 // ============================
-// Initialisation de l'application
+// Initialisation de l'Application
 // ============================
 (function initializeApp() {
   initializeCategories();
   setupEventListeners();
-  fetchBestMovie();
+  fetchBestMovie(); // ✅ Appel de la logique du meilleur film
 })();
