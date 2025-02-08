@@ -15,6 +15,13 @@
 
   <body class="container">
     <!-- ============================ -->
+    <!-- Loader (Affiché pendant le chargement des données) -->
+    <!-- ============================ -->
+    <div id="loader" class="loader-container">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- ============================ -->
     <!-- Modal de Détails du Film    -->
     <!-- ============================ -->
     <div
@@ -37,7 +44,7 @@
           </div>
           <div class="modal-body">
             <div class="row align-items-start">
-              <!-- Détails du film -->
+              <!-- Détails du film (titre, réalisateurs, synopsis, acteurs) -->
               <div class="col-lg-8">
                 <p id="film-details"></p>
                 <h4>Réalisé par :</h4>
@@ -73,7 +80,7 @@
     </div>
 
     <!-- ============================ -->
-    <!-- Navbar                       -->
+    <!-- Navbar (En-tête de l'application) -->
     <!-- ============================ -->
     <header class="navbar">
       <div class="container d-flex">
@@ -88,22 +95,7 @@
     <section class="container mt-4">
       <h3 class="fw-bold titre-text">Meilleur film</h3>
       <div class="row movie-card best-movie">
-        <div class="col-md-3">
-          <img src="affiche-dora.jpg" alt="The Big Lebowski" />
-        </div>
-        <div class="col-md-9 d-flex flex-column">
-          <h4 class="fw-bold titre-text">The Big Lebowski</h4>
-          <p class="movie-description">
-            Jeff "The Dude" Lebowski, mistaken for a millionaire of the same
-            name, seeks restitution for his ruined rug and enlists his bowling
-            buddies to help get it.
-          </p>
-          <div class="text-end">
-            <a href="details.html"
-              ><button class="btn-detail">Détails</button></a
-            >
-          </div>
-        </div>
+        <!-- Le meilleur film sera injecté dynamiquement ici -->
       </div>
     </section>
 
@@ -119,6 +111,7 @@
         <!-- Films d'une catégorie aléatoire injectés dynamiquement -->
       </div>
       <div class="d-flex justify-content-center mt-4">
+        <!-- ✅ Bouton visible uniquement sur les écrans mobiles et tablettes -->
         <button id="voir-plus" class="btn-detail fs-5">Voir plus</button>
       </div>
     </section>
@@ -138,10 +131,15 @@
       <div class="row g-4" id="selected-category-movies">
         <!-- Films basés sur la sélection injectés dynamiquement -->
       </div>
+
+      <div class="d-flex justify-content-center mt-4">
+        <!-- ✅ Deuxième bouton 'Voir plus' avec la même logique responsive -->
+        <button id="voir-plus" class="btn-detail fs-5">Voir plus</button>
+      </div>
     </section>
 
     <!-- ============================ -->
-    <!-- Scripts JavaScript           -->
+    <!-- Scripts JavaScript (Bootstrap & API) -->
     <!-- ============================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="service/api.js"></script>

@@ -1,149 +1,224 @@
+/* ============================ */
+/* Liens de navigation          */
+/* ============================ */
 a {
-  text-decoration: none;
-  color: white;
+  text-decoration: none; /* Supprime le soulignement des liens */
+  color: white; /* Définit la couleur du texte en blanc */
 }
+
+/* ============================ */
+/* Navbar                       */
+/* ============================ */
 .navbar {
-  border: 1px solid black;
-  background-color: #61787f !important;
-  padding: 15px;
-  margin-top: 1%;
+  border: 1px solid black; /* Bordure noire autour de la barre de navigation */
+  background-color: #61787f !important; /* Couleur de fond avec priorité grâce à !important */
+  padding: 15px; /* Espace intérieur de la navbar */
+  margin-top: 1%; /* Marge supérieure pour espacer du haut de la page */
 }
 
+/* Logo de la Navbar */
 .logo {
-  width: 20%;
-  height: auto;
-  margin-left: 5%;
+  width: 20%; /* Largeur de 20% du conteneur parent */
+  height: auto; /* Hauteur automatique pour conserver les proportions */
+  margin-left: 5%; /* Marge à gauche pour l'espacement */
 }
 
-/* Centrer le titre et cacher sur mobile */
+/* Centrage du titre de la Navbar et masquage sur mobile */
 .navbar-title {
-  flex-grow: 1; /* Permet au titre de s'étirer */
-  text-align: center;
+  flex-grow: 1; /* Permet au titre de s'étendre pour remplir l'espace disponible */
+  text-align: center; /* Centre le texte horizontalement */
 }
 
+/* ============================ */
+/* Section Meilleur Film        */
+/* ============================ */
 .best-movie {
-  border: 10px solid black;
-  padding: 15px;
-  display: flex;
-  align-items: center;
+  border: 10px solid black; /* Bordure épaisse pour délimiter la section */
+  padding: 15px; /* Espace intérieur pour le contenu */
+  display: flex; /* Affichage en flexbox pour aligner les éléments */
+  align-items: center; /* Alignement vertical des éléments au centre */
 }
+
+/* ============================ */
+/* Cartes de Films              */
+/* ============================ */
 .movie-card {
-  position: relative;
-  overflow: hidden;
+  position: relative; /* Nécessaire pour positionner l'overlay par rapport à la carte */
+  overflow: hidden; /* Cache le dépassement des éléments enfants */
 }
 
+/* Image de la carte de film */
 .movie-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 100%; /* Largeur maximale de la carte */
+  height: 100%; /* Hauteur maximale de la carte */
+  object-fit: cover; /* Recadre l'image pour remplir la carte sans déformer */
 }
+
+/* Bouton de la carte positionné en bas */
 .best-movie .text-end {
-  margin-top: auto; /* Force le bouton à rester en bas */
+  margin-top: auto; /* Place le bouton en bas de la carte */
 }
+
+/* Description du film */
 .movie-description {
-  font-size: 1.7rem;
-  font-weight: lighter;
-  flex-grow: 1; /* Permet à la description de remplir l’espace */
+  font-size: 1.7rem; /* Taille de la police de la description */
+  font-weight: lighter; /* Police plus fine */
+  flex-grow: 1; /* Remplit l'espace disponible verticalement */
 }
 
-.overlay h5 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin: 0;
-}
-.titre-text {
-  font-weight: bolder;
-  font-size: 3rem;
-}
-
-.btn-detail {
-  background-color: #fa0b0b;
-  color: white;
-  margin-right: 10%;
-  font-size: 1.7rem;
-  font-weight: 300;
-  padding: 12px 40px;
-  border-radius: 30px;
-  border: none;
-  transition: 0.3s ease-in-out;
-}
-
-.overlay .btn-overlay {
-  background-color: #2d2c2c;
-  color: white;
-  font-weight: 300;
-  font-size: 1.2rem;
-  padding: 8px 20px;
-  border-radius: 20px;
-  border: none;
-  align-self: flex-end;
-}
-
+/* ============================ */
+/* Overlay sur les Cartes       */
+/* ============================ */
 .overlay {
-  position: absolute;
-  top: 25%;
-  left: 0;
-  width: 100%;
-  height: 25%;
-  display: flex;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.4);
-  justify-content: space-between;
-  padding: 15px;
-  color: white;
+  position: absolute; /* Positionnement relatif à la carte parente */
+  top: 25%; /* Décalage vers le bas */
+  left: 0; /* Alignement à gauche */
+  width: 100%; /* Largeur maximale */
+  height: 25%; /* Hauteur définie pour l'overlay */
+  display: flex; /* Affichage en flexbox */
+  flex-direction: column; /* Organisation verticale des éléments */
+  background: rgba(0, 0, 0, 0.4); /* Fond semi-transparent noir */
+  justify-content: space-between; /* Distribution uniforme des éléments */
+  padding: 15px; /* Espacement intérieur */
+  color: white; /* Couleur du texte */
 }
+
+/* Titre du film dans l'overlay */
+.overlay h5 {
+  font-size: 1.5rem; /* Taille de la police du titre */
+  font-weight: bold; /* Texte en gras */
+  margin: 0; /* Supprime les marges par défaut */
+}
+
+/* ============================ */
+/* Boutons                      */
+/* ============================ */
+.btn-detail {
+  background-color: #fa0b0b; /* Rouge vif pour attirer l'attention */
+  color: white; /* Texte en blanc */
+  margin-right: 10%; /* Espacement à droite */
+  font-size: 1.7rem; /* Taille de la police */
+  font-weight: 300; /* Police légère */
+  padding: 12px 40px; /* Padding interne du bouton */
+  border-radius: 30px; /* Coins arrondis pour un effet de "pilule" */
+  border: none; /* Suppression de la bordure par défaut */
+  transition: 0.3s ease-in-out; /* Transition douce lors du survol */
+}
+
+/* Bouton dans l'overlay */
+.overlay .btn-overlay {
+  background-color: #2d2c2c; /* Couleur de fond sombre */
+  color: white; /* Texte blanc */
+  font-weight: 300; /* Poids léger de la police */
+  font-size: 1.2rem; /* Taille du texte */
+  padding: 8px 20px; /* Espacement intérieur */
+  border-radius: 20px; /* Coins arrondis */
+  border: none; /* Pas de bordure */
+  align-self: flex-end; /* Aligne le bouton à droite de l'overlay */
+}
+
+/* ============================ */
+/* Titres                       */
+/* ============================ */
+.titre-text {
+  font-weight: bolder; /* Police très épaisse */
+  font-size: 3rem; /* Taille de police grande */
+}
+
+/* ============================ */
+/* Selecteur de Catégorie       */
+/* ============================ */
 .select-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex; /* Flexbox pour aligner label et select */
+  align-items: center; /* Centrage vertical des éléments */
+  gap: 10px; /* Espacement entre les éléments */
 }
 
 /* Style du select */
 .custom-select {
-  font-size: 1.3rem;
-  font-weight: bold;
-  padding: 10px 15px;
-  border: 2px solid black;
-  border-radius: 5px;
-  background-color: white;
-  cursor: pointer;
-  width: 20%; /* Par défaut sur les grands écrans */
-  min-width: 150px; /* Pour éviter qu'il ne devienne trop petit */
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-position: right 10px center;
-  background-size: 14px;
-  padding-right: 35px;
-  transition: all 0.3s ease-in-out;
+  font-size: 1.3rem; /* Taille de la police */
+  font-weight: bold; /* Texte en gras */
+  padding: 10px 15px; /* Espacement intérieur */
+  border: 2px solid black; /* Bordure noire */
+  border-radius: 5px; /* Coins légèrement arrondis */
+  background-color: white; /* Fond blanc */
+  cursor: pointer; /* Curseur en forme de main */
+  width: 20%; /* Largeur par défaut */
+  min-width: 150px; /* Largeur minimale pour éviter un rétrécissement trop important */
+  appearance: none; /* Suppression des styles par défaut du navigateur */
+  transition: all 0.3s ease-in-out; /* Transition douce lors du focus */
 }
 
-/* ✅ Amélioration du focus */
+/* Amélioration du focus */
 .custom-select:focus {
-  outline: none;
-  border-color: black;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  outline: none; /* Suppression de l'encadré bleu par défaut */
+  border-color: black; /* Bordure noire lors du focus */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Ombre pour un effet visuel */
 }
 
-/* ✅ Responsive : Tablette (768px à 991px) */
+/* Label pour le select */
+.title-label {
+  font-size: 1.5rem; /* Taille de police du label */
+  font-weight: bold; /* Texte en gras */
+}
+
+/* ============================ */
+/* Responsive Design            */
+/* ============================ */
+
+/* Tablette (768px à 991px) */
 @media (max-width: 991px) {
   .custom-select {
-    width: 40%; /* Plus large pour les écrans moyens */
+    width: 40%; /* Augmente la largeur du select sur les écrans moyens */
   }
 }
 
-.title-label {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-/* ✅ Responsive : Mobile (< 768px) */
+/* Mobile (< 768px) */
 @media (max-width: 767px) {
   .custom-select {
-    width: 80%; /* Presque toute la largeur en mobile */
-    font-size: 1.1rem; /* Texte plus petit pour s’adapter */
-    padding: 8px 12px;
+    width: 80%; /* Utilise presque toute la largeur disponible */
+    font-size: 1.1rem; /* Taille de police réduite */
+    padding: 8px 12px; /* Moins d'espace intérieur */
   }
   h2 {
-    display: none;
+    display: none; /* Cache le titre principal sur les petits écrans */
   }
+}
+
+/* ============================ */
+/* Styles pour le Loader        */
+/* ============================ */
+.loader-container {
+  position: fixed; /* Position fixe pour recouvrir toute la page */
+  top: 0; /* Collé en haut de la page */
+  left: 0; /* Collé à gauche de la page */
+  width: 100%; /* Largeur de la fenêtre entière */
+  height: 100%; /* Hauteur de la fenêtre entière */
+  background-color: rgba(255, 255, 255, 0.9); /* Fond blanc semi-transparent */
+  display: flex; /* Flexbox pour centrer le loader */
+  justify-content: center; /* Centrage horizontal */
+  align-items: center; /* Centrage vertical */
+  z-index: 9999; /* Au-dessus de tous les autres éléments */
+}
+
+/* Style de l'animation du loader */
+.spinner {
+  width: 50px; /* Taille du cercle de chargement */
+  height: 50px;
+  border: 5px solid #ccc; /* Bordure grise */
+  border-top: 5px solid #007bff; /* Bordure bleue pour l'effet de rotation */
+  border-radius: 50%; /* Forme circulaire */
+  animation: spin 1s linear infinite; /* Animation infinie de rotation */
+}
+
+/* Animation de rotation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg); /* Fait tourner l'élément d'un tour complet */
+  }
+}
+
+/* Masquer le loader après le chargement */
+.hidden {
+  display: none; /* Cache le loader lorsqu'il n'est pas nécessaire */
 }
