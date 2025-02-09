@@ -18,7 +18,7 @@ const DOM = {
     random: document.getElementById("voir-plus-random"),
     selected: document.getElementById("voir-plus-selected"),
   },
-  bestMovieContainer: document.querySelector(".best-movie"), // ✅ Conteneur pour le meilleur film
+  bestMovieContainer: document.querySelector(".best-movie"),
 };
 
 // ============================
@@ -29,7 +29,7 @@ const pagination = {
   selected: { next: null, previous: null },
 };
 
-let isReversing = false; // Pour détecter l'état "Voir moins"
+let isReversing = false;
 
 // ============================
 // Gestion du Loader
@@ -57,9 +57,7 @@ const createMovieCard = (movie) => `
 // Affichage des Films
 // ============================
 const displayMovies = (movies, container) => {
-  movies.forEach((movie) => {
-    container.insertAdjacentHTML("beforeend", createMovieCard(movie));
-  });
+  container.innerHTML = movies.map(createMovieCard).join("");
 };
 
 // ============================
@@ -111,7 +109,9 @@ const fetchMovies = async ({
 }) => {
   toggleLoader(true);
   try {
-    const fetchUrl = url || `${MOVIES_ENDPOINT}?genre=${genre}`;
+    const fetchUrl =
+      url ||
+      `${MOVIES_ENDPOINT}?genre=${genre}&sort_by=-imdb_score&page_size=6`;
     const response = await fetch(fetchUrl);
     const data = await response.json();
 
@@ -137,28 +137,11 @@ const fetchMovies = async ({
 const fetchBestMovie = async () => {
   toggleLoader(true);
   try {
-    const response = await fetch(MOVIES_ENDPOINT);
+    const response = await fetch(
+      `${MOVIES_ENDPOINT}?sort_by=-imdb_score&page_size=1`
+    );
     const data = await response.json();
-
-    const totalPages = Math.ceil(data.count / data.results.length);
-    const maxPages = Math.min(totalPages, 100); // Limite à 100 pages pour optimisation
-
-    const urls = Array.from(
-      { length: maxPages },
-      (_, i) => `${MOVIES_ENDPOINT}?page=${i + 1}`
-    );
-    const fetchPromises = urls.map((url) =>
-      fetch(url).then((res) => res.json())
-    );
-    const allPagesData = await Promise.all(fetchPromises);
-
-    // Trouver le film avec le plus de votes
-    const bestMovie = allPagesData
-      .flatMap((page) => page.results)
-      .reduce(
-        (max, movie) => (movie.votes > (max?.votes || 0) ? movie : max),
-        null
-      );
+    const bestMovie = data.results[0];
 
     if (bestMovie) {
       const bestMovieDetailsResponse = await fetch(
@@ -179,15 +162,9 @@ const fetchBestMovie = async () => {
 // ============================
 const initializeCategories = async () => {
   try {
-    let genres = [];
-    let nextPageUrl = GENRES_ENDPOINT;
-
-    while (nextPageUrl) {
-      const response = await fetch(nextPageUrl);
-      const data = await response.json();
-      genres = [...genres, ...data.results];
-      nextPageUrl = data.next;
-    }
+    const response = await fetch(`${GENRES_ENDPOINT}?page_size=1000`);
+    const data = await response.json();
+    const genres = data.results;
 
     if (genres.length > 0) {
       const randomGenre = genres[Math.floor(Math.random() * genres.length)];
@@ -284,5 +261,5 @@ const showMovieDetails = async (movieId) => {
 (function initializeApp() {
   initializeCategories();
   setupEventListeners();
-  fetchBestMovie(); // ✅ Appel de la logique du meilleur film
+  fetchBestMovie();
 })();
